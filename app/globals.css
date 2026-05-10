@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* Pinehurst palette — warm editorial / sports-almanac aesthetic.
+   Source: design research 2026-04-27. */
+@theme inline {
+  /* Brand greens */
+  --color-evergreen-950: #0B3D2E;   /* primary dark — header, hero bg, primary buttons */
+  --color-evergreen-900: #134932;
+  --color-evergreen-800: #1B5740;
+  --color-evergreen-700: #246A4F;
+  --color-evergreen-600: #2E7D5B;   /* success / verified */
+
+  /* Accent — brass, NOT yellow */
+  --color-brass-700: #8C5A1B;       /* link color */
+  --color-brass-600: #A57727;
+  --color-brass-500: #C8A24B;       /* primary accent — pull-quotes, hero highlight */
+  --color-brass-400: #D4B35A;
+  --color-brass-300: #E0C685;
+
+  /* Surfaces */
+  --color-cream: #F5F1E8;           /* page background — paper feel */
+  --color-cream-darker: #ECE5D2;    /* subtle dividers / hairlines */
+  --color-cream-darkest: #D9D2C0;   /* table borders */
+
+  /* Text */
+  --color-ink: #1F2421;             /* body text — near-black with green undertone */
+  --color-ink-muted: #6B7470;       /* metadata, timestamps */
+
+  /* Status */
+  --color-warn: #B8541F;            /* missing data, edit conflicts */
+
+  /* Type families */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body:    var(--font-public-sans), system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Body defaults — paper background, brass links, public-sans body */
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--color-brass-700); }
+a:hover { color: var(--color-evergreen-950); }
+
+/* Display headers use Fraunces with optical-size axis pushed for headlines.
+   Fraunces is a variable font — opsz controls the letterform character. */
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  font-feature-settings: "ss01" 1, "ss02" 1;  /* alt G + alt L variants */
+  font-variation-settings: "opsz" 96, "SOFT" 50, "WONK" 0;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-ink);
+}
+
+/* Subhead style — Fraunces at smaller opsz with italic for editorial flair */
+.subhead {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-variation-settings: "opsz" 14;
+  color: var(--color-ink-muted);
+}
+
+/* Reusable: "almanac" data table — dense, sortable feel.
+   12-13px type, sticky header, alternating row tint. */
+.almanac-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.almanac-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-cream);
+  border-bottom: 1px solid var(--color-cream-darkest);
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted);
+  padding: 8px 10px;
+}
+.almanac-table tbody td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--color-cream-darker);
+}
+.almanac-table tbody tr:nth-child(even) {
+  background: rgba(217, 210, 192, 0.18);
+}
