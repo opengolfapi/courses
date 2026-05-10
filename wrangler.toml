@@ -1,0 +1,27 @@
+name = "opengolfapi-courses"
+main = ".open-next/worker.js"
+compatibility_date = "2026-05-09"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+# Static assets (Next.js _next/static, public/)
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+run_worker_first = true
+
+# Set production secrets via:
+#   wrangler secret put NEXT_PUBLIC_SUPABASE_URL
+#   wrangler secret put NEXT_PUBLIC_SUPABASE_ANON_KEY
+#   wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#   wrangler secret put RESEND_API_KEY
+#   wrangler secret put NEXT_PUBLIC_SENTRY_DSN
+#   wrangler secret put ADMIN_SESSION_SECRET   # generate: openssl rand -hex 32
+#
+# Custom domain wired separately in dashboard:
+#   Workers & Pages → opengolfapi-courses → Settings → Custom domains
+#   → staging.opengolfapi.org (preview)
+#   → courses.opengolfapi.org (after Phase 6 cutover)
+
+# Local dev only — production reads from secrets
+[vars]
+# (intentionally empty — all real values are secrets)
