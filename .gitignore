@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# OpenNext build output (rebuilt on every deploy / Workers Builds)
+/.open-next/
+/.wrangler/
