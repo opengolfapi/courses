@@ -1,33 +1,38 @@
-name: Deploy to Cloudflare Workers
+name: Deploy
 
+# Public repo → free unlimited GH Actions minutes.
+# Path filter: skip CI on docs-only / cosmetic commits.
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
   workflow_dispatch:
+
+# Cancel previous runs on the same branch to save minutes.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      deployments: write
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-
-      - name: Install
-        run: npm ci
-
+      - run: npm ci
       - name: Typecheck
         run: npx tsc --noEmit
-
-      - name: Build + Deploy to Cloudflare Workers
-        run: npx opennextjs-cloudflare deploy
+      - name: Build + Deploy
+        run: |
+          npx opennextjs-cloudflare build
+          npx opennextjs-cloudflare deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
