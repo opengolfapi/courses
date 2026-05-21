@@ -12,9 +12,12 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = 'OpenGolfAPI <hello@opengolfapi.org>';
 
 async function getClientIp(): Promise<string> {
-  // Vercel sets x-forwarded-for; the first hop is the real client IP.
-  // x-real-ip is also forwarded by Vercel.
+  // Running on Cloudflare Workers: cf-connecting-ip is the trustworthy client
+  // IP — Cloudflare sets it and clients cannot spoof it. x-forwarded-for is a
+  // best-effort fallback (its first hop can be client-supplied).
   const h = await headers();
+  const cf = h.get('cf-connecting-ip');
+  if (cf) return cf.trim();
   const fwd = h.get('x-forwarded-for');
   if (fwd) return fwd.split(',')[0].trim();
   return h.get('x-real-ip') ?? 'unknown';
