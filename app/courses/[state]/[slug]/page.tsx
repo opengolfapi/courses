@@ -471,7 +471,7 @@ export default async function CourseDetailPage({ params }: Props) {
         {/* Tee data only (no holes) */}
         {tees.length > 0 && holes.length === 0 && (
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Tees</h2>
+            <h2 className="font-display tracking-tight text-2xl font-bold mb-4">Tees</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -522,7 +522,7 @@ export default async function CourseDetailPage({ params }: Props) {
           {/* Course Insights */}
           {(hazards.length > 0 || hardestHole || longestHole) && (
             <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <h2 className="font-display tracking-tight text-2xl font-bold mb-4">
                 Course Insights
               </h2>
               <div className="grid grid-cols-2 gap-4">
@@ -574,7 +574,7 @@ export default async function CourseDetailPage({ params }: Props) {
           {/* Season & Weather */}
           {climate && (
             <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <h2 className="font-display tracking-tight text-2xl font-bold mb-4">
                 Season & Weather
               </h2>
 
@@ -656,7 +656,7 @@ export default async function CourseDetailPage({ params }: Props) {
         {/* Nearby */}
         {nearby.length > 0 && (
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Nearby</h2>
+            <h2 className="font-display tracking-tight text-2xl font-bold mb-4">Nearby</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {nearbyCourses.length > 0 && (
                 <div>
@@ -727,7 +727,7 @@ export default async function CourseDetailPage({ params }: Props) {
         {/* Legacy course details (crawler-populated) */}
         {(course.fairway_grass || course.green_grass || course.facilities) && (
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+            <h2 className="font-display tracking-tight text-2xl font-bold mb-4">
               Additional Course Details
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
@@ -767,7 +767,7 @@ export default async function CourseDetailPage({ params }: Props) {
         {/* Community Edits */}
         {recentEdits.length > 0 && (
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">Community Edits</h2>
+            <h2 className="font-display tracking-tight text-2xl font-bold mb-3">Community Edits</h2>
             <ul className="space-y-1.5">
               {recentEdits.map((edit) => (
                 <li key={edit.id} className="text-sm text-gray-600 flex items-center gap-2">
@@ -932,7 +932,7 @@ function PlanYourVisit({ course, fieldReviewers }: { course: CourseRow; fieldRev
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Plan Your Visit</h2>
+      <h2 className="font-display tracking-tight text-2xl font-bold mb-4">Plan Your Visit</h2>
 
       {rates.some(([, v]) => v) && (
         <div className="mb-4">
@@ -1063,7 +1063,7 @@ function AboutCourse({
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">About {course.course_name}</h2>
+      <h2 className="font-display tracking-tight text-2xl font-bold mb-4">About {course.course_name}</h2>
 
       {course.description && (
         <p className="text-gray-700 text-sm leading-relaxed mb-5 whitespace-pre-line">{course.description}</p>
@@ -1114,7 +1114,7 @@ function StaffSection({ course, fieldReviewers }: { course: CourseRow; fieldRevi
   if (!course.head_pro && !course.superintendent && !course.league_info) return null;
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Staff</h2>
+      <h2 className="font-display tracking-tight text-2xl font-bold mb-4">Staff</h2>
       <dl className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-sm">
         {course.head_pro && (
           <div className="flex items-baseline justify-between gap-4">

@@ -80,11 +80,11 @@ export function ApiKeysClient() {
       />
       <button
         type="submit"
-        disabled={view.sending || !view.email}
-        className="px-5 py-3 rounded text-white font-medium disabled:opacity-50"
+        disabled={view.sending}
+        className="px-5 py-3 rounded text-white font-medium transition-opacity disabled:cursor-not-allowed disabled:opacity-80"
         style={{ background: 'var(--color-evergreen-700)' }}
       >
-        {view.sending ? 'Issuing key…' : 'Get my free key'}
+        {view.sending ? 'Issuing key…' : 'Get my free key →'}
       </button>
       {view.error && (
         <p style={{ color: '#b85450' }} className="text-sm">{view.error}</p>
