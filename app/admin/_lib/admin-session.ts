@@ -11,8 +11,8 @@ import 'server-only';
 const TTL_SECONDS = 60 * 60 * 8; // 8 hours
 
 function getSecret(): string {
-  const s = process.env.ADMIN_SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!s) throw new Error('ADMIN_SESSION_SECRET (or SUPABASE_SERVICE_ROLE_KEY fallback) is not set');
+  const s = process.env.ADMIN_SESSION_SECRET;
+  if (!s) throw new Error('ADMIN_SESSION_SECRET is not set — admin cookie cannot be signed. Generate via `openssl rand -hex 32` and set as a Worker secret.');
   return s;
 }
 
