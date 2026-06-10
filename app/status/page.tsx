@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
 
 export const metadata: Metadata = {
   title: "Status",
@@ -82,36 +81,31 @@ async function checkSupabasePing(): Promise<Check> {
   const start = Date.now();
   const checkedAt = new Date().toISOString();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
+  if (!url) {
     return {
       name: "Supabase connection",
-      description: "Service role can reach the database",
+      description: "Auth health endpoint is reachable",
       state: "down",
       ms: 0,
-      detail: "Missing env: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
+      detail: "Missing env: NEXT_PUBLIC_SUPABASE_URL",
       checkedAt,
     };
   }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    // Hitting the auth health endpoint proves Supabase is reachable on the
-    // service-role plane without depending on any specific table.
+    // /auth/v1/health is a public health endpoint — no credentials required.
+    // Never send service-role from a publicly-renderable page.
     const res = await fetch(`${url}/auth/v1/health`, {
       method: "GET",
       signal: controller.signal,
       cache: "no-store",
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-      },
     });
     const ms = Date.now() - start;
     if (res.ok) {
       return {
         name: "Supabase connection",
-        description: "Service role can reach the database",
+        description: "Auth health endpoint is reachable",
         state: ms > 1500 ? "degraded" : "operational",
         ms,
         detail: `HTTP ${res.status}`,
@@ -120,7 +114,7 @@ async function checkSupabasePing(): Promise<Check> {
     }
     return {
       name: "Supabase connection",
-      description: "Service role can reach the database",
+      description: "Auth health endpoint is reachable",
       state: "down",
       ms,
       detail: `HTTP ${res.status}`,
@@ -131,7 +125,7 @@ async function checkSupabasePing(): Promise<Check> {
     const msg = err instanceof Error ? err.message : String(err);
     return {
       name: "Supabase connection",
-      description: "Service role can reach the database",
+      description: "Auth health endpoint is reachable",
       state: "down",
       ms,
       detail: msg.includes("aborted") ? `Timeout after ${TIMEOUT_MS}ms` : msg,
@@ -142,55 +136,42 @@ async function checkSupabasePing(): Promise<Check> {
   }
 }
 
-async function checkApiKeysTable(): Promise<Check> {
+async function checkApiSurface(): Promise<Check> {
+  // Replaces the old service-role api_keys row count probe. Hitting a real
+  // public API endpoint proves Postgres + PostgREST + the API surface are all
+  // reachable end-to-end, without ever sending service-role credentials from
+  // this page. If this 200s, the database layer is up.
   const start = Date.now();
   const checkedAt = new Date().toISOString();
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    return {
-      name: "Postgres / RPC layer",
-      description: "api_keys table is queryable",
-      state: "down",
-      ms: 0,
-      detail: "Missing Supabase env",
-      checkedAt,
-    };
-  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    const client = createClient(url, key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-    const queryPromise = client
-      .from("api_keys")
-      .select("*", { count: "exact", head: true });
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(
-        () => reject(new Error(`Timeout after ${TIMEOUT_MS}ms`)),
-        TIMEOUT_MS,
-      ),
+    const res = await fetch(
+      "https://api.opengolfapi.org/v1/courses/state/CA?limit=1",
+      {
+        method: "GET",
+        signal: controller.signal,
+        cache: "no-store",
+        headers: { "User-Agent": "OpenGolfAPI-Status/1.0" },
+      },
     );
-    const result = (await Promise.race([
-      queryPromise,
-      timeoutPromise,
-    ])) as Awaited<typeof queryPromise>;
     const ms = Date.now() - start;
-    if (result.error) {
+    if (res.ok) {
       return {
         name: "Postgres / RPC layer",
-        description: "api_keys table is queryable",
-        state: "down",
+        description: "Public API surface is reachable end-to-end",
+        state: ms > 1500 ? "degraded" : "operational",
         ms,
-        detail: result.error.message,
+        detail: `HTTP ${res.status}`,
         checkedAt,
       };
     }
     return {
       name: "Postgres / RPC layer",
-      description: "api_keys table is queryable",
-      state: ms > 1500 ? "degraded" : "operational",
+      description: "Public API surface is reachable end-to-end",
+      state: res.status >= 500 ? "down" : "degraded",
       ms,
-      detail: `count=${result.count ?? 0}`,
+      detail: `HTTP ${res.status}`,
       checkedAt,
     };
   } catch (err) {
@@ -198,12 +179,14 @@ async function checkApiKeysTable(): Promise<Check> {
     const msg = err instanceof Error ? err.message : String(err);
     return {
       name: "Postgres / RPC layer",
-      description: "api_keys table is queryable",
+      description: "Public API surface is reachable end-to-end",
       state: "down",
       ms,
-      detail: msg,
+      detail: msg.includes("aborted") ? `Timeout after ${TIMEOUT_MS}ms` : msg,
       checkedAt,
     };
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -273,7 +256,7 @@ export default async function StatusPage() {
       "GET",
     ),
     checkSupabasePing(),
-    checkApiKeysTable(),
+    checkApiSurface(),
   ]);
 
   const checks: Check[] = results.map((r, i) => {
