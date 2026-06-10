@@ -518,6 +518,63 @@ export default async function CourseDetailPage({ params }: Props) {
           </div>
         )}
 
+        {/* Difficulty silhouette — every course gets a unique 18-bar
+            fingerprint of how strokes-index difficulty is distributed
+            across the round. Bar height = (19 - HCP) so HCP-1 is tallest;
+            color encodes par. Renders only when we have ≥18 holes with
+            handicap_index populated. */}
+        {(() => {
+          const silhouette = holes
+            .filter(h => h.hole_number != null && h.hole_number >= 1 && h.hole_number <= 18)
+            .reduce<Record<number, { par: number | null; hcp: number | null }>>(
+              (acc, h) => {
+                const n = h.hole_number as number;
+                if (!acc[n]) acc[n] = { par: h.par ?? null, hcp: h.handicap_index ?? null };
+                return acc;
+              }, {});
+          const ordered = Array.from({ length: 18 }, (_, i) => i + 1).map(n => ({ n, ...(silhouette[n] ?? { par: null, hcp: null }) }));
+          const haveHcps = ordered.filter(o => o.hcp != null).length;
+          if (haveHcps < 14) return null; // need most of the round to render meaningfully
+          const parColor = (par: number | null) =>
+            par === 3 ? "var(--color-brass-700)"
+            : par === 5 ? "var(--color-ink)"
+            : "var(--color-evergreen-700)";
+          return (
+            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+              <p className="font-display italic text-[13px] mb-1" style={{ color: "var(--color-brass-700)", fontVariationSettings: '"opsz" 14' }}>
+                The shape of the round
+              </p>
+              <h2 className="font-display tracking-tight text-2xl font-bold mb-2">
+                Difficulty silhouette.
+              </h2>
+              <p className="text-sm mb-5 max-w-[560px]" style={{ color: "var(--color-ink-muted)" }}>
+                Each bar is one hole. Height encodes its stroke-index rank — the highest bar is the toughest hole on the card. Color encodes par.
+              </p>
+              <div className="flex items-end gap-[3px] h-32 mb-2">
+                {ordered.map(o => {
+                  const hcpRank = o.hcp ?? 18;
+                  const heightPct = Math.max(8, ((19 - hcpRank) / 18) * 100);
+                  return (
+                    <div key={o.n} className="flex-1 flex flex-col items-center min-w-0" title={`Hole ${o.n} · Par ${o.par ?? "?"} · HCP ${o.hcp ?? "?"}`}>
+                      <div className="w-full rounded-t" style={{ height: `${heightPct}%`, background: parColor(o.par), minHeight: 6 }} />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex justify-between text-[10px] tabular-nums mb-3" style={{ color: "var(--color-ink-muted)" }}>
+                {ordered.map(o => (
+                  <span key={o.n} className="flex-1 text-center">{o.n}</span>
+                ))}
+              </div>
+              <div className="flex gap-5 text-[11px]" style={{ color: "var(--color-ink-muted)" }}>
+                <span className="flex items-center gap-1.5"><span style={{ display: "inline-block", width: 10, height: 10, background: "var(--color-brass-700)" }} /> Par 3</span>
+                <span className="flex items-center gap-1.5"><span style={{ display: "inline-block", width: 10, height: 10, background: "var(--color-evergreen-700)" }} /> Par 4</span>
+                <span className="flex items-center gap-1.5"><span style={{ display: "inline-block", width: 10, height: 10, background: "var(--color-ink)" }} /> Par 5</span>
+              </div>
+            </div>
+          );
+        })()}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Course Insights */}
           {(hazards.length > 0 || hardestHole || longestHole) && (

@@ -40,7 +40,13 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-body);
-  background: var(--color-cream);
+  background-color: var(--color-cream);
+  /* Subtle SVG-noise paper grain — ~3% ink dust on cream so the surface
+     reads as printed almanac stock rather than a flat web fill. The base
+     frequency is high so the grain stays fine; the alpha is low so type
+     contrast is unaffected. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.122  0 0 0 0 0.141  0 0 0 0 0.129  0 0 0 0.035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-attachment: fixed;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
 }
