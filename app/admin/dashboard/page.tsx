@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import { SystemHealth } from './system-health';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -195,6 +196,9 @@ export default async function AdminDashboardPage() {
         <Counter label="Signups (24h)" value={signupsToday} sublabel="New keys" />
         <Counter label="Edits (24h)" value={editsToday} sublabel={Object.entries(editStatusBreakdown).map(([s, n]) => `${n} ${s}`).join(' · ') || '—'} />
       </div>
+
+      {/* System Health — cron, security drift, email delivery, Sentry */}
+      <SystemHealth />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
         {/* Tier breakdown */}
