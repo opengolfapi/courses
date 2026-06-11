@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MobileNav } from "./mobile-nav";
 
 const US_STATES = [
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
@@ -10,12 +11,12 @@ const US_STATES = [
 
 export function SiteHeader() {
   return (
-    <header className="bg-cream border-b border-cream-darkest" style={{ background: "var(--color-cream)", borderColor: "var(--color-cream-darkest)" }}>
+    <header className="relative bg-cream border-b border-cream-darkest" style={{ background: "var(--color-cream)", borderColor: "var(--color-cream-darkest)" }}>
       <nav className="max-w-[1100px] mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="font-display text-[22px] font-bold tracking-tight" style={{ color: "var(--color-evergreen-950)" }}>
           Open<em style={{ color: "var(--color-brass-700)", fontStyle: "italic" }}>Golf</em>API
         </Link>
-        <div className="flex items-center gap-6 text-sm" style={{ color: "var(--color-ink-muted)" }}>
+        <div className="hidden md:flex items-center gap-6 text-sm" style={{ color: "var(--color-ink-muted)" }}>
           <details className="relative group [&[open]>summary>span]:rotate-180">
             <summary className="list-none cursor-pointer hover:text-[var(--color-evergreen-950)] transition-colors inline-flex items-center gap-1 select-none">
               Browse
@@ -47,6 +48,7 @@ export function SiteHeader() {
             Submit
           </Link>
         </div>
+        <MobileNav />
       </nav>
     </header>
   );

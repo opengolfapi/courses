@@ -344,8 +344,10 @@ export default async function CourseDetailPage({ params }: Props) {
 
       <OwnerBanner courseId={course.id} isClaimed={isClaimed} />
 
-      {/* TWO-COLUMN — prose + infobox/KBYG sidebar */}
-      <section className="max-w-[1100px] mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-10">
+      {/* TWO-COLUMN — prose + map left, infobox/KBYG right rail.
+          The aside spans both rows so the map slides up beside it;
+          on mobile the DOM order gives description → infobox → map. */}
+      <section className="max-w-[1100px] mx-auto px-6 pt-10 grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-8">
         <div className="md:col-span-2 space-y-4">
           {course.description ? (
             <p className="font-display text-[19px] leading-[1.65]" style={{ fontVariationSettings: '"opsz" 14' }}>{course.description}</p>
@@ -353,7 +355,7 @@ export default async function CourseDetailPage({ params }: Props) {
             <p className="text-[17px] leading-[1.65]" style={{ color: "var(--color-ink-muted)" }}>{desc}</p>
           )}
         </div>
-        <aside className="space-y-6">
+        <aside className="space-y-6 md:col-start-3 md:row-span-2">
           {/* INFOBOX — Wikipedia-style */}
           <div className="border rounded-md p-5 bg-white" style={{ borderColor: "var(--color-cream-darkest)" }}>
             <p className="font-display italic text-xs mb-3" style={{ color: "var(--color-brass-700)" }}>The course at a glance</p>
@@ -408,20 +410,18 @@ export default async function CourseDetailPage({ params }: Props) {
             </div>
           )}
         </aside>
-      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Location Map */}
+        {/* Location Map — second row of the left column, beside the rail */}
         {course.latitude && course.longitude && (
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Location &amp; Nearby</h2>
+          <section className="md:col-span-2 md:col-start-1">
+            <h2 className="font-display tracking-tight text-2xl font-bold mb-4">Location &amp; Nearby</h2>
             <CourseMap
               lat={course.latitude}
               lng={course.longitude}
               name={course.course_name}
               nearby={nearby}
             />
-            <div className="mt-2 flex gap-4 text-sm text-gray-500">
+            <div className="mt-2 flex gap-4 text-sm" style={{ color: "var(--color-ink-muted)" }}>
               <a
                 href={`https://www.openstreetmap.org/?mlat=${course.latitude}&mlon=${course.longitude}#map=15/${course.latitude}/${course.longitude}`}
                 target="_blank"
@@ -440,7 +440,7 @@ export default async function CourseDetailPage({ params }: Props) {
               </a>
             </div>
             {nearby.length > 0 && (
-              <div className="mt-3 flex gap-4 text-xs text-gray-400">
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs" style={{ color: "var(--color-ink-muted)" }}>
                 <span><span style={{color:'#3b82f6'}}>●</span> Hotels</span>
                 <span><span style={{color:'#f59e0b'}}>●</span> Restaurants</span>
                 <span><span style={{color:'#16a34a'}}>●</span> Golf Courses</span>
@@ -455,7 +455,9 @@ export default async function CourseDetailPage({ params }: Props) {
             />
           </section>
         )}
+      </section>
 
+      <div className="max-w-[1100px] mx-auto px-6 py-8 space-y-8">
         {/* Tee Selector + Scorecard */}
         {tees.length > 0 && holes.length > 0 && (
           <TeeSelector tees={tees} holes={holes} />
