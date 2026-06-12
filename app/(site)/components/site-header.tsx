@@ -39,6 +39,7 @@ export function SiteHeader() {
           </details>
           <Link href="/search" className="hover:text-[var(--color-evergreen-950)] transition-colors">Search</Link>
           <Link href="/near-me" className="hover:text-[var(--color-evergreen-950)] transition-colors">Near me</Link>
+          <Link href="/contribute" className="hover:text-[var(--color-evergreen-950)] transition-colors">Contribute</Link>
           <a href="https://opengolfapi.org/#api" className="hover:text-[var(--color-evergreen-950)] transition-colors">API</a>
           <Link
             href="/submit"

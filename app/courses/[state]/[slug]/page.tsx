@@ -133,10 +133,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const details = [parStr, yardStr].filter(Boolean).join(", ");
   const canonical = `https://courses.opengolfapi.org/courses/${state}/${found.canonicalSlug ?? found.courseId}`;
 
+  // Thin-content gate: non-US stubs stay noindex,follow until they earn enough
+  // substance to index (scorecard or par+yardage+a contact signal). US pages are
+  // never gated — they're complete enough and already indexed.
+  const isUS = !course.country || course.country === "United States";
+  const hasSubstance =
+    (course.par_total != null && course.total_yardage != null) ||
+    tees.length > 0;
+  const indexable = isUS || hasSubstance;
+
   return {
     title: `${course.course_name} - ${course.city}, ${course.state}`,
     description: `${course.course_name} in ${course.city}, ${course.state}. ${details}.${ratingStr} Full scorecard, tee data, and nearby courses.`,
     alternates: { canonical },
+    ...(indexable ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${course.course_name} - ${course.city}, ${course.state} | OpenGolfAPI`,
       description: `${details}.${ratingStr}`,
@@ -409,6 +419,38 @@ export default async function CourseDetailPage({ params }: Props) {
               </p>
             </div>
           )}
+
+          {/* THIS PAGE NEEDS — surface the gaps so visitors become editors */}
+          {(() => {
+            const gaps: string[] = [];
+            if (!course.green_fees) gaps.push("green fees");
+            if (!course.architect) gaps.push("architect");
+            if (!course.year_built) gaps.push("year built");
+            if (!course.dress_code) gaps.push("dress code");
+            if (!course.walking_policy) gaps.push("walking policy");
+            if (!course.hours_text) gaps.push("hours");
+            if (!course.phone) gaps.push("phone");
+            if (gaps.length === 0) return null;
+            return (
+              <div className="border border-dashed rounded-md p-5" style={{ borderColor: "var(--color-brass-700)", background: "rgba(255,255,255,0.5)" }}>
+                <p className="font-display italic text-xs mb-2" style={{ color: "var(--color-brass-700)" }}>
+                  This page needs a regular
+                </p>
+                <p className="text-sm leading-relaxed mb-3">
+                  We&rsquo;re missing the {gaps.slice(0, 4).join(", ")}
+                  {gaps.length > 4 ? ` and ${gaps.length - 4} more` : ""} for this course.
+                  Play here? You probably know them.
+                </p>
+                <a
+                  href="#edit"
+                  className="inline-block px-3 py-1.5 rounded text-sm font-semibold border hover:bg-white transition-colors"
+                  style={{ borderColor: "var(--color-evergreen-950)", color: "var(--color-evergreen-950)" }}
+                >
+                  Fill in what you know →
+                </a>
+              </div>
+            );
+          })()}
         </aside>
 
         {/* Location Map — second row of the left column, beside the rail */}

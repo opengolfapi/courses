@@ -42,6 +42,7 @@ export function MobileNav() {
           <div className="flex flex-col gap-1 text-[15px]" style={{ color: "var(--color-ink)" }}>
             <Link href="/search" className="py-2">Search</Link>
             <Link href="/near-me" className="py-2">Near me</Link>
+            <Link href="/contribute" className="py-2">Contribute</Link>
             <a href="https://opengolfapi.org/#api" className="py-2">API</a>
             <Link
               href="/submit"

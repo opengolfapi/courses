@@ -21,6 +21,10 @@ async function fetchAllCourses(): Promise<Array<{ id: string; slug: string | nul
       .from("golf_courses")
       .select("id, slug, state, updated_at")
       .not("state", "is", null)
+      // International stubs are noindex until enriched (see course page
+      // generateMetadata) — keep them out of the sitemap too, or Search
+      // Console flags the noindex/sitemap conflict on every stub.
+      .eq("country", "United States")
       .range(offset, offset + PAGE - 1);
     if (error || !data || data.length === 0) break;
     all.push(...(data as Array<{ id: string; slug: string | null; state: string; updated_at: string | null }>));
